@@ -89,3 +89,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# Project-scope template directory
+TEMPLATE_DIRS = os.path.join(BASE_DIR, "templates")
+
+# Directory and URL where uploaded files are kept
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_URL = "/media/"

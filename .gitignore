@@ -1,3 +1,6 @@
+# Media folder
+media/
+
 # SQLite 3 database files
 *.sqlite3
 
