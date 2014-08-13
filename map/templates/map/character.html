@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<h1>{{character.name}}</h1>
+<img src="{{character.portrait.url}}" />
+<h2>Stats</h2>
+<table border=1>
+    <tr><td>Wounds</td><td>Strain</td></tr>
+    <tr>
+        <td>{{character.wounds}}/{{character.wound_threshold}}</td>
+        <td>{{character.strain}}/{{character.strain_threshold}}</td>
+    </tr>
+</table>
+
+{% endblock %}

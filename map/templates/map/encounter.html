@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% load staticfiles %}
+
+{% block CSS %}
+<style type="text/css">
+    canvas { border: 2px solid black; }
+</style>
+{% endblock %}
+
+{% block Javascript %}
+<!-- provide server data as a JSON object -->
+<script type="text/javascript">
+    var encounterData = {
+        "mapImageURL" : "{{map.image.url}}",
+        "characterImageURLList" : [
+        {% for char in characters %}
+            "{{char.portrait.url}}",
+        {% endfor %}
+        ]
+    };
+    console.log(encounterData);
+</script>
+
+<script type="text/javascript" src="{% static "map/encounter.js" %}"></script>
+{% endblock %}
+
+{% block content %}
+
+<center>
+    <canvas id="drawable" width=1024 height=768>
+        Your browser does not support the HTML5 Canvas specification.
+        Get a better browser, yo.
+    </canvas>
+</center>
+
+{% endblock %}
