@@ -1,45 +1,74 @@
-console.log("Loaded encounter.js");
-console.log("There are "+encounterData.characterImageURLList.length+" characters on this map");
+// Namespace EotEGMT, sub-namespace Encounter
+var EotEGMT = EotEGMT || {};
 
-// Draw function
-function draw() {
-    // Gain access to the 2D drawing context for the canvas on the page
-    var canvas = document.getElementById('drawable');
-    if(!canvas) {
-        console.log("failed to retrieve element 'drawable'");
-        return null;
-    }
-    var context = canvas.getContext('2d');
-    if(!context){
-        console.log("Failed to get 2d context");
-        return null;
-    } else {
-        console.log("Got context!");
-    }
-
-    // Create new Images, define draw calls
+EotEGMT.Encounter = {
+    // Properties
     
-    var loadFunc = function(x, y, img){
-        return function() {
-            context.drawImage(img, x, y);
+    // Assigned during init() on window load
+    drawContext: null,
+    map: null,
+    tokens: null,
+    
+    // Objects
+    Point: function(X, Y) {
+        this.x = X;
+        this.y = Y;
+    },
+
+    Token: function(url) {
+        this.image_url = url;
+        this.loaded = false;
+        this.image = new Image();
+        this.position = new E.Point(0, 0);
+
+        this.draw = function(ctx) {
+            if(this.loaded && ctx != null) {
+                ctx.drawImage(this.image, this.position.x, this.position.y);
+            }
         };
-    };
 
-    var mapImg = new Image();
-    var char1Img = new Image();
-    var char2Img = new Image();
+        this.load = function() {
+            var self = this;
+            this.image.addEventListener("load", function() {
+                self.loaded = true;
+                E.doDraw();
+            }, false);
+            this.image.src = this.image_url;
+        };
+    },
 
-    mapImg.onload = loadFunc(0, 0, mapImg);
-    char1Img.onload = loadFunc(200, 150, char1Img);
-    char2Img.onload = loadFunc(600, 180, char2Img);
+    // Methods
+    init: function() {
+        console.log("init()");
 
-    // Begin image download
-    mapImg.src = encounterData.mapImageURL;
-    char1Img.src = encounterData.characterImageURLList[0];
-    char2Img.src = encounterData.characterImageURLList[1];
+        // Wrap the raw image URLs inside of Token objects then load the image
+        E.map = new E.Token(encounterData.mapImageURL);
+        E.map.load();
+        E.tokens = [];
+        
+        encounterData.characterImageURLList.forEach(function(url) {
+            E.tokens.push(new E.Token(url));
+            E.tokens[E.tokens.length - 1].load();
+        });
+
+        // Retrieve and store the canvas' 2d drawing context
+        E.drawContext = document.getElementById('drawable').getContext('2d');
+
+        // Mess with the positions of the tokens, for debugging
+        E.tokens[0].position = new E.Point(200, 100);
+        E.tokens[1].position = new E.Point(550, 180);
+    },
+
+    doDraw: function() {
+        // Draw the map first, then tokens on to.
+        E.map.draw(E.drawContext);
+        for(var i = 0; i < E.tokens.length; ++i) {
+            E.tokens[i].draw(E.drawContext);
+        }
+    }
+
 };
-
-// Wait until the window is finished loading to draw canvas
-window.onload=draw;
+var E = EotEGMT.Encounter;
 
 
+window.onload = E.init;
